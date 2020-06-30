@@ -98,6 +98,10 @@
             grid-template-rows: 10% 20% 70%;
             grid-template-areas: "titolo titolo titolo" "bottoni punti ." "tavolo tavolo tavolo";
             }
+
+            .carte {
+                margin:-15px;
+            }
         }
     </style>
 </head>
@@ -161,7 +165,6 @@
                 carta.style.margin=i+"px";
                 carta.className = "carte";
                 carta.id="mazzoPartita"+(i+1);
-                //carta.style.margin=(-i).toString()+"px";
                 carta.style.borderRadius = "6px";
                 carta.style.borderStyle = "solid";
                 carta.style.borderColor = "black";
@@ -184,7 +187,7 @@
             carta.ontransitionend = function () {
                 carta.style.gridArea=areaGriglia;
                 carta.id=arrivo.id+posizione;
-                carta.style.margin="-5px";
+                carta.style.margin="initial";
                 carta.style.left = "0px";
                 carta.style.top ="0px";
                 arrivo.replaceChild(carta,divArrivo);
