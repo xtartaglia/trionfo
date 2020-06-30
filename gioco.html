@@ -145,7 +145,7 @@
         var mazzoPartita = [];
         var turno = false;
         var secondoAGiocare = false;
-        var ultimoTurnoIniziatoDaMe;;
+        var ultimoTurnoIniziatoDaMe;
         var cartaMia;
         var cartaTua;
         var nomeUtente;
@@ -195,7 +195,7 @@
             var posizione = areaGriglia.substring(areaGriglia.length - 1, areaGriglia.length); 
             var divArrivo = document.createElement("DIV");
             arrivo.appendChild(divArrivo);
-            divArrivo.className="carte";
+            divArrivo.className="carteGiocate";
             divArrivo.style.borderColor="transparent";
             divArrivo.style.gridArea = areaGriglia;
             carta.style.left = (divArrivo.offsetLeft-carta.offsetLeft)+"px";
@@ -203,7 +203,7 @@
             carta.ontransitionend = function () {
                 carta.style.gridArea=areaGriglia;
                 carta.id=arrivo.id+posizione;
-                carta.style.className="carteGiocate";
+                carta.className="carteGiocate";
                 carta.style.left = "0px";
                 carta.style.top ="0px";
                 arrivo.replaceChild(carta,divArrivo);
