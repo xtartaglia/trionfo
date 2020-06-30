@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<head>
+    <title>Trionfo</title>
+    <style>
+        body {
+            background-color: darkgreen;
+            color:white;
+        }
+
+        #griglia {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: auto auto auto;
+            grid-template-areas: "title title title" ". form ." ". . .";
+            grid-gap: 10px;
+            align-items:center;
+        }
+
+        #titolo {
+            text-align:center;
+            grid-area: title;
+        }
+
+        #formulario {
+            display:flex;
+            grid-area: form;
+            text-align:center;
+        }
+    </style>
+</head>
+<html>
+<body>
+    <div id="griglia">
+        <div id="titolo">
+            <h1>Trionfo</h1>
+        </div>
+        <div id="formulario">
+            <form>
+                <table style="margin-left: auto; margin-right: auto">
+                    <tr>
+                        <td style="text-align:left">
+                            <label for="nomeSala">Nome sala:</label>
+                        </td>
+                        <td style="text-align:right">
+                            <input type="text" id="nomeSala" style="width:80%" autocomplete="off" required>
+                        </td>
+                    </tr>
+                </table>
+                <input type="submit" value="Eddaje" style="margin-top:10%">
+            </form>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+<script>
+    var socket = io.connect();
+    var formulario = document.getElementById("formulario");
+    formulario.onsubmit = (e)=>{
+        e.preventDefault();
+        creareSala();
+    }
+
+    function creareSala() {
+        var nomeSala = document.getElementById("nomeSala").value;
+        var numeroGiocatori = 2;
+        
+        socket.emit('creare sala', nomeSala, numeroGiocatori);
+        socket.on('sala creata', ()=>{
+            location.replace(nomeSala);
+        })
+    }
+</script>
+</body>
+</html> 

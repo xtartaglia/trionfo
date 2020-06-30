@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<head>
+    <title>Trionfo</title>
+    <style>
+        body {
+            background-color: darkgreen;
+            color:white;
+        }
+
+        #griglia {
+            display:grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            grid-template-rows: 10% 90%;
+            grid-template-areas: "titolo titolo titolo" "bottoni tavolo punti";
+        }
+
+        #tavolo {
+            grid-area: tavolo;
+            display:grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            grid-template-rows: 1fr 2fr 1fr;
+            grid-template-areas: "mazzoAvversario mazzoAvversario mazzoAvversario" "mazzoPartita carteScelte ." "mazzoGiocatore mazzoGiocatore mazzoGiocatore";
+        }
+
+        #mazzoAvversario {
+            grid-area: mazzoAvversario;
+            display:grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: 100px;
+            gap:0px;
+            margin:auto;
+            grid-template-areas: "carta0 carta1 carta2 carta3 carta4 carta5 carta6 carta7 carta8 carta9";
+        }
+
+        #mazzoGiocatore {
+            grid-area: mazzoGiocatore;
+            display:grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: 100px;
+            gap:0px;
+            margin:auto;
+            grid-template-areas: "carta0 carta1 carta2 carta3 carta4 carta5 carta6 carta7 carta8 carta9";
+        }
+
+        #mazzoPartita {
+            grid-area: mazzoPartita;
+            width:50px;
+            height:auto;
+            margin-right:auto;
+            display:grid;
+            grid-template-areas: "mazzo";
+        }
+
+        #carteScelte {
+            grid-area: carteScelte;
+            display:grid;
+            grid-template-areas: "carta1 carta2";
+            margin:auto;
+            gap:15px;
+        }
+
+        #bottoni {
+            grid-area: bottoni;
+            margin: auto;
+        }
+
+        #titolo {
+            margin:auto;
+            grid-area: titolo;
+        }
+
+        #punti {
+            margin:auto;
+            width:80%;
+        }
+
+        .carte {
+            height:100px;
+            width:50px;
+            border-radius: 6px;
+            border-style: solid;
+            border-color: black;
+            border-width:1px;
+            position:relative;
+            margin:-5px;
+            top:0px;
+            left:0px;
+            transition-property: left,top;
+            transition-duration: 0.5s, 0.5s;
+            transition-timing-function: ease-in,ease-in;
+        }
+
+        @media screen and (max-width: 40.5em) {
+            #griglia {
+            display:grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 10% 20% 70%;
+            grid-template-areas: "titolo titolo titolo" "bottoni punti ." "tavolo tavolo tavolo";
+            }
+        }
+    </style>
+</head>
+<html>
+<body onload="ciao()">
+    <div id="griglia">
+        <div id="titolo">
+            <h1>Trionfo</h1>
+        </div>
+        <div id="tavolo">
+            <div class="mazzo" id="mazzoPartita"></div>
+            <div class="mazzo" id="mazzoGiocatore"></div>
+            <div class="mazzo" id="mazzoAvversario"></div>
+            <div class="mazzo" id="carteScelte"></div>
+        </div>
+        <div id="punti"></div>
+        <div id="bottoni">
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io.connect();
+        var mazzoGiocatore = [];
+        var mazzoGiocatoreGrafico = [];
+        var mazzoPartita = [];
+        var turno = false;
+        var secondoAGiocare = false;
+        var ultimoTurnoIniziatoDaMe;;
+        var cartaMia;
+        var cartaTua;
+        var nomeUtente;
+
+        function ciao() {
+            nomeUtente = prompt('Ehilà! Come ti chiami?');
+            if (nomeUtente === "" || nomeUtente == null) {
+                nomeUtente = "M¥SS KETA";
+            }
+            var nomeSala = location.pathname.substring(1);
+            socket.emit('ciao',nomeUtente,nomeSala);
+        }
+
+        function pescareCarta() {
+            alert('Complimenti, hai cliccato sul mazzo! Stai sul pezzo!');
+                mazzoPartita.splice(0,1);
+                //console.log(mazzoPartita.length);
+                area.innerHTML = "";
+                disegnareMazzoPartita(mazzoPartita.length);
+                //console.log('E \'nnamo');
+        };
+
+        function disegnareMazzoPartita(carteRimanenti) {
+            var mazzoPartita = [];
+            var area = document.getElementById("mazzoPartita");
+            for (var i=0;i<carteRimanenti;i++) {
+                var carta = document.createElement("DIV");
+                var immagine = new Image();
+                immagine.src ='/img/retro.jpg';
+                area.appendChild(carta);
+                carta.style.backgroundImage = "url('"+immagine.src+"')";
+                carta.style.backgroundSize = "50px 100px";
+                carta.style.margin=i+"px";
+                carta.className = "carte";
+                carta.id="mazzoPartita"+(i+1);
+                //carta.style.margin=(-i).toString()+"px";
+                carta.style.borderRadius = "6px";
+                carta.style.borderStyle = "solid";
+                carta.style.borderColor = "black";
+                carta.style.borderWidth = "1px";
+                carta.style.gridArea = "mazzo";
+                mazzoPartita.push(carta);
+            }
+            //console.log('Ecco il valore di "mazzoPartita": '+mazzoPartita.length);
+        }
+
+        function spostareCarta(carta,arrivo,areaGriglia,cliccare,grafica=0) {
+            var posizione = areaGriglia.substring(areaGriglia.length - 1, areaGriglia.length); 
+            var divArrivo = document.createElement("DIV");
+            arrivo.appendChild(divArrivo);
+            divArrivo.className="carte";
+            divArrivo.style.borderColor="transparent";
+            divArrivo.style.gridArea = areaGriglia;
+            carta.style.left = (divArrivo.offsetLeft-carta.offsetLeft)+"px";
+            carta.style.top = (divArrivo.offsetTop-carta.offsetTop)+"px";
+            carta.ontransitionend = function () {
+                carta.style.gridArea=areaGriglia;
+                carta.id=arrivo.id+posizione;
+                carta.style.margin="-5px";
+                carta.style.left = "0px";
+                carta.style.top ="0px";
+                arrivo.replaceChild(carta,divArrivo);
+                socket.emit('controlla se ci sono ancora carte');
+                if (grafica !== 0) {
+                    var valore = grafica.valore;
+                    var seme = grafica.seme;
+                    console.log("Ecco la carta: "+valore+", "+seme);
+                    var immagine = new Image();
+                    immagine.src ='/img/carte.jpg';
+                    carta.style.backgroundImage = "url('"+immagine.src+"')";
+                    carta.style.backgroundSize = "500px 400px";
+                    carta.style.backgroundPosition = (-50*valore).toString()+"px "+(-100*seme).toString()+"px";
+                    if (cliccare==true) {
+                        carta.onclick = function() {
+                            if (turno==true) {
+                                carta.onclick = null;
+                                socket.emit('carta giocata',valore,seme,"mazzoAvversario"+posizione);
+                                socket.on('carta valida',(val,sem)=>{
+                                    if (val==valore && sem==seme) {
+                                        turno=false;
+                                        cartaMia = spostareCarta(carta,document.getElementById("carteScelte"),"carta1",false);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            return carta;
+        }
+
+        function animazioneCartaVincente(cartaVincente,cartaPerdente) {
+
+            cartaVincente.style.left = (cartaPerdente.offsetLeft-cartaVincente.offsetLeft)+"px";
+            cartaVincente.style.top = (cartaPerdente.offsetTop-cartaVincente.offsetTop)+"px";
+            cartaVincente.ontransitionend = function() {
+                document.getElementById("carteScelte").removeChild(cartaPerdente);
+                setTimeout(()=>{
+                    document.getElementById("carteScelte").removeChild(cartaVincente);
+                },1000);
+            }
+
+        };
+
+        function definireCliccato(carta,posizione) {
+                carta.onclick = function() {
+                    if (turno==true) {
+                        carta.onclick = null;
+                        socket.emit('carta giocata',carta.valore,carta.seme,"mazzoAvversario"+posizione);
+                        console.log("Ecco la carta che è stata inviata: "+carta.id);
+                        socket.on('carta valida',(val,sem)=>{
+                            if (val==carta.valore && sem==carta.seme) {
+                                console.log("Ecco il valore e il seme: "+val+" "+sem);
+                                turno=false;
+                                cartaMia = spostareCarta(carta,document.getElementById("carteScelte"),"carta1",false);
+                            }
+                        });
+                    }
+                }
+            }
+
+        function ridisegnareMazzo(mazzo) {
+            console.log("Benvenuto nella funzione 'ridisegnareMazzo', ecco a te il mazzo: "+mazzo);
+            var mazzoGiocatore=ordinareCarte(mazzo);
+            var area=document.getElementById("mazzoGiocatore");
+            area.innerHTML="";
+
+            for (var i=0;i<mazzoGiocatore.length;i++) {
+                carta = document.createElement("DIV");
+                carta.id="mazzoGiocatore"+i;
+                var valore = mazzoGiocatore[i].valore;
+                var seme = mazzoGiocatore[i].seme;
+                carta.valore = valore;
+                carta.seme = seme;
+                var immagine = new Image();
+                immagine.src ='/img/carte.jpg';
+                carta.className="carte";
+                carta.style.backgroundImage = "url('"+immagine.src+"')";
+                carta.style.backgroundSize = "500px 400px";
+                carta.style.gridArea="carta"+i;
+                carta.style.backgroundPosition = (-50*valore).toString()+"px "+(-100*seme).toString()+"px";
+                area.appendChild(carta);
+                definireCliccato(carta,i);
+            }
+        };
+
+        function ridisegnareMazzoAvversario(mazzo) {
+            var area = document.getElementById("mazzoAvversario");
+            area.innerHTML="";
+            for (var i=0;i<mazzo.length;i++) {
+                var carta = document.createElement("DIV");
+                var immagine = new Image();
+                immagine.src ='/img/retro.jpg';
+                area.appendChild(carta);
+                carta.style.backgroundImage = "url('"+immagine.src+"')";
+                carta.style.backgroundSize = "50px 100px";
+                carta.className = "carte";
+                carta.id="mazzoAvversario"+i;
+                carta.style.borderRadius = "6px";
+                carta.style.borderStyle = "solid";
+                carta.style.borderColor = "black";
+                carta.style.borderWidth = "1px";
+                carta.style.gridArea = "carta"+i;
+            }
+        }
+
+        function ordinareCarte(mazzo) {
+            mazzo = mazzo.sort((a,b)=>{
+               return a.seme-b.seme;
+            });
+
+            mazzo = mazzo.sort((a,b)=>{
+                if (a.seme == b.seme) {
+                    return a.potenza-b.potenza;
+                }
+            });
+
+            return mazzo;
+        };
+
+        function nuovaPartita() {
+            socket.emit('nuova partita');
+            document.getElementById("bottoni").innerHTML = "";
+        };
+
+        function controllareSeBriscolaValida(briscola)  {
+            var testPassato = false;
+            if (briscola == "denari" || briscola == "coppe" || briscola == "bastoni" || briscola == "spade") {
+                testPassato = true;
+            }
+
+            return testPassato;
+        }
+
+        socket.on('sala inesistente',()=>{
+            alert('Sala inesistente');
+            location.replace('/');
+        });
+
+        socket.on('nome già preso',()=>{
+            alert('Caspita! Esiste già un altro utente con questo nome :(');
+            ciao();
+        });
+
+        socket.on('aspetta',()=>{
+            document.getElementById("carteScelte").innerHTML = "In attesa dell'altro giocatore";
+        });
+
+        socket.on('hai iniziato questo turno',()=>{
+            ultimoTurnoIniziatoDaMe = true;
+        });
+
+        socket.on('non hai iniziato questo turno',()=>{
+            ultimoTurnoIniziatoDaMe = false;
+        });
+
+        socket.on('sala al completo',()=>{
+            alert('Questa sala è già al completo');
+            location.replace('/');
+        })
+
+        socket.on('partita pronta',()=>{
+            document.getElementById("carteScelte").innerHTML = "";
+            document.getElementById("bottoni").innerHTML = '<input type="button" id="nuovaPartita" onclick="nuovaPartita()" value="Nuova Partita">';
+        });
+
+        socket.on('carta non valida',()=>{
+            alert('Devi rispondere col seme');
+        })
+
+        socket.on('aggiornare tabella giocatori',(tabellaGiocatori)=>{
+            var area = document.getElementById("punti");
+            area.innerHTML="";
+            var table = document.createElement("TABLE");
+            area.appendChild(table);
+            table.style.width="100%";
+
+            for (var i=0;i<tabellaGiocatori.length;i++) {
+                if (tabellaGiocatori[i].turno==true) {
+                    table.innerHTML += '<tr><td><strong>'+tabellaGiocatori[i].nome+'</strong></td><td style="text-align:right"><strong>'+tabellaGiocatori[i].punteggio+'</strong></td></tr>'
+                }
+
+                else {
+                    table.innerHTML += '<tr><td>'+tabellaGiocatori[i].nome+'</td><td style="text-align:right">'+tabellaGiocatori[i].punteggio+'</td></tr>';
+                }
+            };
+        })
+
+        socket.on('carte distribuite',(mazzo,numeroCarteRimanenti)=>{
+            document.getElementById("bottoni").innerHTML = "";
+            document.getElementById("mazzoGiocatore").innerHTML = "";
+            document.getElementById("mazzoAvversario").innerHTML = "";
+            document.getElementById("carteScelte").innerHTML = "";
+            document.getElementById("mazzoPartita").innerHTML = "";
+            disegnareMazzoPartita(40);
+            mazzoGiocatore = ordinareCarte(mazzo);
+            lunghezza = mazzoGiocatore.length;
+            mazzoGiocatoreGrafico = [];
+            var i=0;
+            var posizioneGiocatore = 0;
+            var posizioneAvversario = 0;
+            var distribuireCarte = setInterval(()=>{
+                if (i%2==0) {
+                    var cartaGiocatore = document.getElementById("mazzoPartita"+(40-i));
+                    cartaGiocatore.style.zIndex = i.toString();
+                    var grafica = {valore:mazzoGiocatore[posizioneGiocatore].valore,seme:mazzoGiocatore[posizioneGiocatore].seme};
+                    spostareCarta(cartaGiocatore,document.getElementById("mazzoGiocatore"),"carta"+(posizioneGiocatore),true,grafica);
+                    posizioneGiocatore++;
+                }
+
+                else {
+                    var cartaAvversario = document.getElementById("mazzoPartita"+(40-i));
+                    cartaAvversario.style.zIndex = i.toString();
+                    spostareCarta(cartaAvversario,document.getElementById("mazzoAvversario"),"carta"+(posizioneAvversario),false);
+                    posizioneAvversario++;
+                }
+                i++;
+                if (i==20) {
+                    clearInterval(distribuireCarte);
+                    socket.emit('controllare accusi o briscola');
+                }
+            },500);
+            
+
+            //disegnareMazzoPartita(numeroCarteRimanenti);
+        });
+
+        socket.on('nuova carta',(mazzoA,mazzoB,numeroCarteRimanenti)=>{
+            console.log("Io sono stato chiamato comunque");
+            console.log("Ecco il valore di 'numeroCarteRimanenti': "+numeroCarteRimanenti);
+            document.getElementById("bottoni").innerHTML = "";
+            document.getElementById("carteScelte").innerHTML = "";
+            
+            function ottenerePosizioneCartaMancante(mazzoArrivo) {
+                var area = document.getElementById(mazzoArrivo);
+                var posizione=0;
+
+                for (var j=0;j<area.childNodes.length;j++) {
+                    if (area.childNodes[j].id!=(mazzoArrivo+j||area.childNodes[j]==null)) {
+                        break;
+                    }
+                    posizione++;
+                }
+
+                return posizione;
+            }
+
+            var posGiocatore = ottenerePosizioneCartaMancante("mazzoGiocatore");
+            var posAvversario = ottenerePosizioneCartaMancante("mazzoAvversario");
+            console.log('CAGAMI SONO QUI: '+posGiocatore);
+            console.log('CAGAMI SONO QUI (BIS): '+posAvversario);
+            var graficaA = {valore:mazzoA[mazzoA.length-1].valore,seme:mazzoA[mazzoA.length-1].seme};
+            var graficaB = {valore:mazzoB[mazzoB.length-1].valore,seme:mazzoB[mazzoB.length-1].seme};
+            var k = 0;
+            var distribuireCarte = setInterval(()=>{
+                if (document.getElementById("mazzoPartita").childNodes.length>0) {
+                    if (k%2==0) {
+                        spostareCarta(document.getElementById("mazzoPartita").lastChild,document.getElementById("mazzoGiocatore"),"carta"+posGiocatore,false,graficaA);
+                    }
+                    else {
+                        spostareCarta(document.getElementById("mazzoPartita").lastChild,document.getElementById("mazzoAvversario"),"carta"+posAvversario,false,graficaB);
+                    }
+                    
+                    if (k==1) {
+                        setTimeout(()=>{
+                            ridisegnareMazzo(mazzoA);
+                            ridisegnareMazzoAvversario(mazzoB);
+                        },2000);
+                        socket.emit('controllare accusi o briscola');
+                        clearInterval(distribuireCarte);
+                    }
+                }
+
+                else {
+                    ridisegnareMazzo(mazzoA);
+                    ridisegnareMazzoAvversario(mazzoB);
+                    clearInterval(distribuireCarte);
+                }
+
+                k++;
+            },750);
+        });
+
+        socket.on('tocca a te',()=>{
+            console.log("It's my turrrrrrrn");
+            turno = true;
+            secondoAGiocare = false;
+        });
+
+        socket.on('hai vinto la mano', ()=>{
+            console.log('Complimenti, hai vinto la mano');
+            turno = true;
+            console.log(cartaMia+" "+cartaTua);
+            cartaMia.style.zIndex = cartaTua.style.zIndex+1;
+            setTimeout(()=>{
+                animazioneCartaVincente(cartaMia,cartaTua);
+            },1000);
+        });
+
+        socket.on('hai perso la mano',()=>{
+            console.log('Caspita, hai perso la mano');
+            turno = false;
+            console.log(cartaMia+" "+cartaTua);
+            cartaTua.style.zIndex = cartaMia.style.zIndex+1;
+            setTimeout(()=>{
+                animazioneCartaVincente(cartaTua,cartaMia);
+            },1000);
+        });
+
+        socket.on('carta giocata da avversario',(valore,seme,cartaGiocata)=>{
+            var cartaAvversario = document.getElementById(cartaGiocata);
+            var grafica = {valore:valore,seme:seme};
+            cartaTua = spostareCarta(cartaAvversario,document.getElementById("carteScelte"),"carta2",false,grafica);
+            turno = true;
+            secondoAGiocare = true;
+        });
+
+        socket.on('turno finito',()=>{
+            if (ultimoTurnoIniziatoDaMe == false) {
+                document.getElementById("bottoni").innerHTML = '<input type="button" id="rimescolareMazzo" onclick="nuovaPartita()" value="Rimescolare il mazzo">';
+            }
+            else {
+                document.getElementById("carteScelte").innerHTML = "Devi aspettare che l'altro giocatore mescoli e distribuisca il mazzo";
+            }
+        });
+
+        socket.on('napoli',(giocatore,seme)=>{
+            alert(giocatore+" ha una napoli di "+seme);
+        });
+
+        socket.on('buongioco',(giocatore, numero, valore, mancante)=>{
+            var dizionarioMancante = ["denari","coppe","bastoni","spade"];
+
+            if (mancante == "niente") {
+                semeMancante == mancante;
+            }
+
+            else {
+                semeMancante == dizionarioMancante[mancante];
+            }
+
+            alert(giocate+" ha un buongioco: "+numero+" "+valore+", mancate "+semeMancante)
+        });
+
+        socket.on('scegliere briscola',()=>{
+            var briscola = prompt('Devi scegliere la briscola (denari, coppe, bastoni o spade):');
+            while (!controllareSeBriscolaValida(briscola)) {
+                var briscola = prompt('Caspita, la briscola scelta non sembra rientrare nei valori predefiniti. Scegli tra questi valori: "denari", "coppe", "bastoni" e "spade".');
+            }
+            socket.emit('briscola scelta',briscola);
+        });
+
+        socket.on('ecco la briscola',(briscola)=>{
+            alert('Il seme della briscola è: '+briscola);
+        });
+
+        socket.on('partita finita',(risultatiFinali)=>{
+            if (risultatiFinali=="pareggio") {
+                alert('Pareggio! Complimenti a tutti i giocatori!');
+                location.replace('/');
+            }
+
+            else if (nomeUtente==risultatiFinali.vincitore.nome) {
+                alert('Complimenti! Hai vinto la partita '+risultatiFinali.vincitore.punteggio+' a '+risultatiFinali.perdente.punteggio);
+                //location.replace('/');
+            }
+
+            else {
+                alert('Mi dispiace, hai perso la partita '+risultatiFinali.vincitore.punteggio+' a '+risultatiFinali.perdente.punteggio);
+                //location.replace('/');
+            }
+        });
+
+        socket.on('partita eliminata',()=>{
+            alert('L\'altro giocatore ha lasciato la partita e perciò quest\'ultima è stata eliminata.');
+            location.replace('/');
+        });
+    </script>
+</body>
+</html> 
