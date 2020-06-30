@@ -205,10 +205,10 @@
                     if (cliccare==true) {
                         carta.onclick = function() {
                             if (turno==true) {
-                                carta.onclick = null;
                                 socket.emit('carta giocata',valore,seme,"mazzoAvversario"+posizione);
                                 socket.on('carta valida',(val,sem)=>{
                                     if (val==valore && sem==seme) {
+                                        carta.onclick = null;
                                         turno=false;
                                         cartaMia = spostareCarta(carta,document.getElementById("carteScelte"),"carta1",false);
                                     }
