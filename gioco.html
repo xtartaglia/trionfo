@@ -448,9 +448,11 @@
             var distribuireCarte = setInterval(()=>{
                 if (document.getElementById("mazzoPartita").childNodes.length>0) {
                     if (k%2==0) {
+                        document.getElementById("mazzoPartita").lastChild.style.zIndex = "100";
                         spostareCarta(document.getElementById("mazzoPartita").lastChild,document.getElementById("mazzoGiocatore"),"carta"+posGiocatore,false,graficaA);
                     }
                     else {
+                        document.getElementById("mazzoPartita").lastChild.style.zIndex = "100";
                         spostareCarta(document.getElementById("mazzoPartita").lastChild,document.getElementById("mazzoAvversario"),"carta"+posAvversario,false,graficaB);
                     }
                     
