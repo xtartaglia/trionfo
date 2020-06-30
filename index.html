@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Trionfo</title>
     <style>
         body {
@@ -11,20 +12,29 @@
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             grid-template-rows: auto auto auto;
-            grid-template-areas: "title title title" ". form ." ". . .";
+            grid-template-areas: "titolo titolo titolo" ". formulario ." ". . .";
             grid-gap: 10px;
             align-items:center;
         }
 
         #titolo {
             text-align:center;
-            grid-area: title;
+            grid-area: titolo;
         }
 
         #formulario {
             display:flex;
-            grid-area: form;
+            grid-area: formulario;
             text-align:center;
+        }
+
+        @media screen and (max-width: 40.5em) {
+            #griglia {
+            display:grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: 20% 80%;
+            grid-template-areas: "titolo" "formulario";
+            }
         }
     </style>
 </head>
