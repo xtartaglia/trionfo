@@ -83,23 +83,7 @@
             border-color: black;
             border-width:1px;
             position:relative;
-            margin:-5px;
-            top:0px;
-            left:0px;
-            transition-property: left,top;
-            transition-duration: 0.5s, 0.5s;
-            transition-timing-function: ease-in,ease-in;
-        }
-
-        .carteGiocate {
-            height:100px;
-            width:50px;
-            border-radius: 6px;
-            border-style: solid;
-            border-color: black;
-            border-width:1px;
-            position:relative;
-            margin:-10px;
+            margin:-15px;
             top:0px;
             left:0px;
             transition-property: left,top;
@@ -115,7 +99,7 @@
             grid-template-areas: "titolo titolo titolo" "bottoni punti ." "tavolo tavolo tavolo";
             }
 
-            .carteGiocate {
+            .carte {
                 margin:-15px;
             }
         }
@@ -195,7 +179,7 @@
             var posizione = areaGriglia.substring(areaGriglia.length - 1, areaGriglia.length); 
             var divArrivo = document.createElement("DIV");
             arrivo.appendChild(divArrivo);
-            divArrivo.className="carteGiocate";
+            divArrivo.className="carte";
             divArrivo.style.borderColor="transparent";
             divArrivo.style.gridArea = areaGriglia;
             carta.style.left = (divArrivo.offsetLeft-carta.offsetLeft)+"px";
@@ -204,7 +188,7 @@
                 carta.style.gridArea=areaGriglia;
                 carta.id=arrivo.id+posizione;
                 carta.style.margin="-10px";
-                carta.className="carteGiocate";
+                carta.className="carte";
                 carta.style.left = "0px";
                 carta.style.top ="0px";
                 arrivo.replaceChild(carta,divArrivo);
@@ -565,6 +549,21 @@
 
         socket.on('ecco la briscola',(briscola)=>{
             alert('Il seme della briscola è: '+briscola);
+            if (briscola == "denari") {
+                document.body.style.backgroundColor="#ff9d00";
+            }
+
+            else if (briscola == "coppe") {
+                document.body.style.backgroundColor="#ff4000";
+            }
+
+            else if (briscola == "bastoni") {
+                document.body.style.backgroundColor="#96501a";
+            }
+
+            else if (briscola == "spade") {
+                document.body.style.backgroundColor="#168bde";
+            }
         });
 
         socket.on('partita finita',(risultatiFinali)=>{
