@@ -173,7 +173,7 @@ function controllareQuattroDiDenari(nomeSala,giocatore) {
             }
             var idAvversario = sale[nomeSala].giocatori[avversario].id;
             io.to(id).emit('scegliere briscola');
-            io.to(idAvversario).broadcast.emit('avversario sta scegliendo briscola');
+            io.to(idAvversario).emit('avversario sta scegliendo briscola');
         }
     }
 }
