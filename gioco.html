@@ -538,6 +538,10 @@
             socket.emit('briscola scelta',briscola);
         });
 
+        socket.on('avversario sta scegliendo briscola',()=>{
+            alert("L'avversario sta scegliendo la briscola!");
+        })
+
         socket.on('ecco la briscola',(briscola)=>{
             alert('Il seme della briscola è: '+briscola);
         });

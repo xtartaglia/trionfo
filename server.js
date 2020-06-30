@@ -164,7 +164,8 @@ function controllareQuattroDiDenari(nomeSala,giocatore) {
     for (var j=0;j<mazzo.length;j++) {
         if (mazzo[j].seme == 0 && mazzo[j].valore == 3 && !sale[nomeSala].hasOwnProperty("briscola")) {
             var id = sale[nomeSala].giocatori[giocatore].id;
-            io.to(id).emit('scegliere briscola');
+            socket.emit('scegliere briscola');
+            socket.broadcast.emit('avversario sta scegliendo briscola');
         }
     }
 }
