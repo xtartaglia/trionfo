@@ -91,6 +91,22 @@
             transition-timing-function: ease-in,ease-in;
         }
 
+        .carteGiocate {
+            height:100px;
+            width:50px;
+            border-radius: 6px;
+            border-style: solid;
+            border-color: black;
+            border-width:1px;
+            position:relative;
+            margin:-5px;
+            top:0px;
+            left:0px;
+            transition-property: left,top;
+            transition-duration: 0.5s, 0.5s;
+            transition-timing-function: ease-in,ease-in;
+        }
+
         @media screen and (max-width: 40.5em) {
             #griglia {
             display:grid;
@@ -99,7 +115,7 @@
             grid-template-areas: "titolo titolo titolo" "bottoni punti ." "tavolo tavolo tavolo";
             }
 
-            .carte {
+            .carteGiocate {
                 margin:-15px;
             }
         }
@@ -187,7 +203,7 @@
             carta.ontransitionend = function () {
                 carta.style.gridArea=areaGriglia;
                 carta.id=arrivo.id+posizione;
-                carta.style.margin="inherit";
+                carta.style.className="carteGiocate";
                 carta.style.left = "0px";
                 carta.style.top ="0px";
                 arrivo.replaceChild(carta,divArrivo);
