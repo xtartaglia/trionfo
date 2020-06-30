@@ -99,7 +99,7 @@
             border-color: black;
             border-width:1px;
             position:relative;
-            margin:-5px;
+            margin:-10px;
             top:0px;
             left:0px;
             transition-property: left,top;
@@ -203,6 +203,7 @@
             carta.ontransitionend = function () {
                 carta.style.gridArea=areaGriglia;
                 carta.id=arrivo.id+posizione;
+                carta.style.margin="-10px";
                 carta.className="carteGiocate";
                 carta.style.left = "0px";
                 carta.style.top ="0px";

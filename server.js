@@ -19,7 +19,7 @@ app.get('/img/retro.jpg', (req, res)=>{
     res.sendFile(__dirname + '/img/retro.jpg');
 })
 
-server.listen(process.env.PORT,()=>{
+server.listen(8080,()=>{
     console.log('listening on 8080');
 });
 
@@ -164,8 +164,16 @@ function controllareQuattroDiDenari(nomeSala,giocatore) {
     for (var j=0;j<mazzo.length;j++) {
         if (mazzo[j].seme == 0 && mazzo[j].valore == 3 && !sale[nomeSala].hasOwnProperty("briscola")) {
             var id = sale[nomeSala].giocatori[giocatore].id;
-            socket.emit('scegliere briscola');
-            socket.broadcast.emit('avversario sta scegliendo briscola');
+            var avversario;
+            var utenti = Object.keys(sale[nomeSala].giocatori);
+            for (var i=0;i<utenti.length;i++) {
+                if (giocatore != utenti[i]) {
+                    avversario = utenti[i];
+                }
+            }
+            var idAvversario = sale[nomeSala].giocatori[avversario].id;
+            io.to(id).emit('scegliere briscola');
+            io.to(idAvversario).broadcast.emit('avversario sta scegliendo briscola');
         }
     }
 }
