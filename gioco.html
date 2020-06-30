@@ -380,6 +380,7 @@
         })
 
         socket.on('carte distribuite',(mazzo,numeroCarteRimanenti)=>{
+            document.body.style.backgroundColor="darkgreen";
             document.getElementById("bottoni").innerHTML = "";
             document.getElementById("mazzoGiocatore").innerHTML = "";
             document.getElementById("mazzoAvversario").innerHTML = "";
