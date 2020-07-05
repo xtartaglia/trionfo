@@ -56,6 +56,14 @@
                             <input type="text" id="nomeSala" style="width:80%" autocomplete="off" required>
                         </td>
                     </tr>
+                    <tr>
+                        <td style="text-align:left">
+                            <label for="briscola">Giocare con la briscola:</label>
+                        </td>
+                        <td style="text-align:right">
+                            <input type="checkbox" id="briscola" style="width:80%">
+                        </td>
+                    </tr>
                 </table>
                 <input type="submit" value="Eddaje" style="margin-top:10%">
             </form>
@@ -73,8 +81,16 @@
     function creareSala() {
         var nomeSala = document.getElementById("nomeSala").value;
         var numeroGiocatori = 2;
+        var briscola = document.getElementById("briscola");
+        if (briscola.checked==true) {
+            briscola = true;
+        }
+
+        else {
+            briscola = false;
+        }
         
-        socket.emit('creare sala', nomeSala, numeroGiocatori);
+        socket.emit('creare sala', nomeSala, numeroGiocatori, briscola);
         socket.on('sala creata', ()=>{
             location.replace(nomeSala);
         })

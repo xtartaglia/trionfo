@@ -298,14 +298,15 @@ function vincitoreMano(nomeSala) {
 }
 
 io.on('connect',(socket)=>{
-    socket.on('creare sala',(nomeSala,numeroGiocatori)=>{
+    socket.on('creare sala',(nomeSala,numeroGiocatori,briscola)=>{
         sale[nomeSala] = {
             nomeSala: nomeSala,
             numeroGiocatori: numeroGiocatori,
             partitaIniziata: false,
             mazzo:[],
             giocatori:{},
-            numeroTurni:0
+            numeroTurni:0,
+            giocareConBriscola:briscola
         };
         console.log('La sala "'+nomeSala+'" è stata creata');
         console.log(sale);
@@ -606,7 +607,7 @@ io.on('connect',(socket)=>{
         if (sale[socket.room].numeroTurni<=3) {
             controllareAccusi(socket.room,socket.nomeUtente);
         }
-        if (!sale[socket.room].hasOwnProperty("briscola")) {
+        if (!sale[socket.room].hasOwnProperty("briscola") && sale[socket.room].giocareConBriscola == true) {
             controllareQuattroDiDenari(socket.room,socket.nomeUtente);
         }
     })
