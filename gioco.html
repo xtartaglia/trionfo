@@ -335,7 +335,15 @@
             ciao();
         });
 
-        socket.on('aspetta',()=>{
+        socket.on('aspetta',(briscola)=>{
+            if (briscola == false) {
+                document.getElementById("titolo").innerHTML = "<h1>Tresette</h1>";
+                document.title = "Tresette ― "+location.pathname.substring(1);
+            }
+
+            else {
+                document.title = "Trionfo ― "+location.pathname.substring(1);
+            }
             document.getElementById("carteScelte").innerHTML = "In attesa dell'altro giocatore";
         });
 
@@ -352,7 +360,15 @@
             location.replace('/');
         })
 
-        socket.on('partita pronta',()=>{
+        socket.on('partita pronta',(briscola)=>{
+            if (briscola == false) {
+                document.getElementById("titolo").innerHTML = "<h1>Tresette</h1>";
+                document.title = "Tresette ― "+location.pathname.substring(1);
+            }
+
+            else {
+                document.title = "Trionfo ― "+location.pathname.substring(1);
+            }
             document.getElementById("carteScelte").innerHTML = "";
             document.getElementById("bottoni").innerHTML = '<input type="button" id="nuovaPartita" onclick="nuovaPartita()" value="Nuova Partita">';
         });

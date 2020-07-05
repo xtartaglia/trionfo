@@ -390,11 +390,11 @@ io.on('connect',(socket)=>{
             io.to(socket.room).emit('aggiornare tabella giocatori',tabellaGiocatori);
 
             if (Object.keys(sale[nomeSala].giocatori).length == sale[nomeSala].numeroGiocatori) {
-                io.to(socket.room).emit('partita pronta');
+                io.to(socket.room).emit('partita pronta',sale[socket.room].giocareConBriscola);
             }
 
             else {
-                io.to(socket.room).emit('aspetta');
+                io.to(socket.room).emit('aspetta',sale[socket.room].giocareConBriscola);
             }
         }
 
