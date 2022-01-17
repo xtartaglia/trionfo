@@ -2,8 +2,6 @@ var app = require('express')(),
     server = require('http').createServer(app),
     io = require('socket.io').listen(server),
     ent = require('ent');
- 
-app.set('port', (process.env.PORT || 4000));
 
 app.get('/',(req, res)=>{
     res.sendFile(__dirname + '/index.html');
@@ -21,7 +19,7 @@ app.get('/img/retro.jpg', (req, res)=>{
     res.sendFile(__dirname + '/img/retro.jpg');
 })
 
-server.listen(port,()=>{
+server.listen(10028,()=>{
     console.log('listening on 8080');
 });
 
