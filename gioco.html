@@ -175,6 +175,7 @@
         var cartaMia;
         var cartaTua;
         var nomeUtente;
+        var animazioneFinita = true;
 
         function ciao() {
             nomeUtente = prompt('Ehilà! Come ti chiami?');
@@ -246,7 +247,7 @@
                     carta.style.backgroundPosition = (-50*valore).toString()+"px "+(-100*seme).toString()+"px";
                     if (cliccare==true) {
                         carta.onclick = function() {
-                            if (turno==true) {
+                            if (turno==true && animazioneFinita) {
                                 socket.emit('carta giocata',valore,seme,"mazzoAvversario"+posizione);
                                 socket.on('carta valida',(val,sem)=>{
                                     if (val==valore && sem==seme) {
@@ -272,6 +273,7 @@
                 document.getElementById("carteScelte").removeChild(cartaPerdente);
                 setTimeout(()=>{
                     document.getElementById("carteScelte").removeChild(cartaVincente);
+                    animazioneFinita = true
                 },1000);
             }
 
@@ -543,6 +545,7 @@
 
         socket.on('hai vinto la mano', ()=>{
             console.log('Complimenti, hai vinto la mano');
+            animazioneFinita = false;
             turno = true;
             console.log(cartaMia+" "+cartaTua);
             cartaMia.style.zIndex = cartaTua.style.zIndex+1;
@@ -553,6 +556,7 @@
 
         socket.on('hai perso la mano',()=>{
             console.log('Caspita, hai perso la mano');
+            animazioneFinita = false;
             turno = false;
             console.log(cartaMia+" "+cartaTua);
             cartaTua.style.zIndex = cartaMia.style.zIndex+1;
