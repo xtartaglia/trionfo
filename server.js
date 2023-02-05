@@ -19,8 +19,8 @@ app.get('/img/retro.jpg', (req, res)=>{
     res.sendFile(__dirname + '/img/retro.jpg');
 })
 
-server.listen(80,()=>{
-    console.log('listening on 8080');
+server.listen(process.env.PORT,()=>{
+    console.log('listening on '+process.env.PORT);
 });
 
 var sale = {};
