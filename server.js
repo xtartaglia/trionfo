@@ -19,7 +19,7 @@ app.get('/img/retro.jpg', (req, res)=>{
     res.sendFile(__dirname + '/img/retro.jpg');
 })
 
-server.listen(process.env.PORT,()=>{
+server.listen(process.env.PORT || 5000,()=>{
     console.log('listening on '+process.env.PORT);
 });
 
